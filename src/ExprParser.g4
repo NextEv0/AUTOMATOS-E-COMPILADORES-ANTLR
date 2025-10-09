@@ -11,7 +11,7 @@ programa
 
 // Bloco principal entre "inicio" e "fim"
 bloco
-  : BEGIN comandos END
+  : comandos
   ;
 
 // Lista de comandos
