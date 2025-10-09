@@ -1,0 +1,18 @@
+principal {
+  inicio
+    inteiro i = 0;
+    inteiro soma = 0;
+
+    enquanto (i < 5) {
+      soma = soma + i;
+      i = i + 1;
+    }
+
+    // sua gramática atual exige ';' após o incremento:
+    para (i = 0; i < 3; i = i + 1;) {
+      escreve(i);
+    }
+
+    retorna soma;
+  fim
+}

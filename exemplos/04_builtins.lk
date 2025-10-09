@@ -1,0 +1,15 @@
+principal {
+  inicio
+    inteiro n = entrada();
+    inteiro r = aleatorio(1, 10);   // sem acento: 'aleatorio'
+    inteiro f = faixa(3, 7);
+    inteiro m = absoluto(0 - 5);    // evita unário; usa subtração binária
+    inteiro q = raiz(9);
+
+    escreve("n=");  escreve(n);
+    escreve(" r="); escreve(r);
+    escreve(" f="); escreve(f);
+    escreve(" m="); escreve(m);
+    escreve(" q="); escreve(q);
+  fim
+}

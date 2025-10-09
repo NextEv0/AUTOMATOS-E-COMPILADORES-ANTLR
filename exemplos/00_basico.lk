@@ -1,0 +1,17 @@
+principal {
+  inicio
+    inteiro a = 2;
+    real b = 3.5e+1;      // FLOAT com expoente
+    logico p = verdadeiro;
+    texto msg = "Oi\nLukeras!";
+
+    a = a + 3 * 2;        // precedência
+    a = a ^ 2;            // exponenciação
+    b = b / 2.0;
+
+    p = nao falso ou (verdadeiro e nao falso);
+
+    escreve(msg);
+    retorna a;
+  fim
+}
