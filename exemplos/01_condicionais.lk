@@ -1,5 +1,4 @@
 principal {
-  inicio
     inteiro x = 10;
 
     se (x > 10) {
@@ -14,5 +13,4 @@ principal {
     se ((x >= 0) e (x <= 100)) {
       escreve("entre 0 e 100");
     }
-  fim
 }
