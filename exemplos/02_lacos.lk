@@ -1,5 +1,4 @@
 principal {
-  inicio
     inteiro i = 0;
     inteiro soma = 0;
 
@@ -14,5 +13,4 @@ principal {
     }
 
     retorna soma;
-  fim
 }
