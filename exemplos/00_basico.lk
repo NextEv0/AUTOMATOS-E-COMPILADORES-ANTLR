@@ -1,5 +1,4 @@
 principal {
-  inicio
     inteiro a = 2;
     real b = 3.5e+1;      // FLOAT com expoente
     logico p = verdadeiro;
@@ -13,5 +12,4 @@ principal {
 
     escreve(msg);
     retorna a;
-  fim
 }
