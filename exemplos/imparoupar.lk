@@ -1,10 +1,8 @@
 principal {
-  inicio
     inteiro n = entrada();
     se (n % 2 == 0) {
       escreve("Par");
     } senao {
       escreve("Ímpar");
     }
-  fim
 }
