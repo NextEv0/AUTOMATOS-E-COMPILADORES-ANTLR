@@ -1,5 +1,4 @@
 principal {
-  inicio
     inteiro n = entrada();
     inteiro r = aleatorio(1, 10);   // sem acento: 'aleatorio'
     inteiro f = faixa(3, 7);
@@ -11,5 +10,4 @@ principal {
     escreve(" f="); escreve(f);
     escreve(" m="); escreve(m);
     escreve(" q="); escreve(q);
-  fim
 }
