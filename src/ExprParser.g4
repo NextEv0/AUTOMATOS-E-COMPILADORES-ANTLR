@@ -4,60 +4,80 @@ options {
   tokenVocab=ExprLexer;
 }
 
-// Ponto de entrada do programa
+// --- Estrutura Principal ---
+
 programa
   : MAIN LBRACE bloco RBRACE (funcao)* EOF 
   ;
 
-// Bloco principal entre "inicio" e "fim"
 bloco
   : comandos
   ;
 
-// Lista de comandos
 comandos
   : comando*
   ;
 
-// Comando genérico
 comando
   : declaracao
-  | atribuicao
+  | atribuicaoCmd       // Atribuição como comando (com ;)
   | condicional
   | laco
-  | chamadaFuncaoStandalone
+  | chamadaCmd          // Chamada de função como comando (com ;)
   | retorno
   ;
 
-// Declaração de variável com tipo (ex: inteiro x = 5;)
+// --- Declarações e Atribuições ---
+
+// Ex: inteiro x = 10; ou inteiro x;
 declaracao
   : DTYPE ID (EQ expressao)? SEMI
   ;
 
-// Atribuição simples (ex: x = 10;)
-atribuicao
-  : ID EQ expressao SEMI
+// Atribuição usada como comando isolado: x = 10;
+atribuicaoCmd
+  : atribuicaoExpr SEMI
   ;
 
-// Estrutura condicional completa com if, senãose e senao
+// Atribuição usada dentro de expressões ou for: x = 10
+atribuicaoExpr
+  : ID EQ expressao
+  ;
+
+// --- Estruturas de Controle ---
+
 condicional
-  : IF LPAREN expressao RPAREN LBRACE comandos RBRACE
-    (ELSIF LPAREN expressao RPAREN LBRACE comandos RBRACE)*
-    (ELSE LBRACE comandos RBRACE)?
+  : IF LPAREN expressao RPAREN LBRACE bloco RBRACE
+    (ELSIF LPAREN expressao RPAREN LBRACE bloco RBRACE)*
+    (ELSE LBRACE bloco RBRACE)?
   ;
 
-// Laços de repetição: enquanto e para
 laco
-  : WHILE LPAREN expressao RPAREN LBRACE comandos RBRACE
-  | FOR LPAREN atribuicao expressao SEMI atribuicao RPAREN LBRACE comandos RBRACE
+  : WHILE LPAREN expressao RPAREN LBRACE bloco RBRACE
+  // CORREÇÃO: O ';' agora faz parte da estrutura do FOR, não da atribuição
+  | FOR LPAREN (atribuicaoExpr)? SEMI (expressao)? SEMI (atribuicaoExpr)? RPAREN LBRACE bloco RBRACE
   ;
 
-// Versão standalone das funções que exigem ponto e vírgula
-chamadaFuncaoStandalone
+// --- Funções ---
+
+funcao
+  : FUNCAO DTYPE ID LPAREN parametros? RPAREN LBRACE bloco RBRACE
+  ;
+
+parametros
+  : DTYPE ID (COMMA DTYPE ID)*
+  ;
+
+retorno
+  : RETURN expressao? SEMI
+  ;
+
+// Chamada de função "solta" no código (ex: escreve("Ola");)
+chamadaCmd
   : chamadaFuncao SEMI
   ;
 
-// Chamadas de função que retornam valores ou são usadas como expressão
+// Chamada de função real
 chamadaFuncao
   : WRITE LPAREN argumentos? RPAREN
   | INPUT LPAREN RPAREN
@@ -67,46 +87,44 @@ chamadaFuncao
   | SQRT LPAREN argumentos RPAREN
   | ID LPAREN argumentos? RPAREN 
   ;
+
 argumentos
-  : expressao (COMMA expressao)*;
-
-// Comando de retorno
-retorno
-  : RETURN expressao SEMI
+  : expressao (COMMA expressao)*
   ;
 
-// Definição de função personalizada
-funcao
-  : FUNCAO DTYPE ID LPAREN parametros? RPAREN LBRACE bloco RBRACE
-  ;
+// --- Expressões (Hierarquia de Precedência Correta) ---
 
-parametros
-  : DTYPE ID (COMMA DTYPE ID)*
-  ;
-
-// Expressões matemáticas, lógicas e chamadas de função
 expressao
-  : expressao POW expressao         #ExpOp
-  | expressao MUL expressao         #MulOp
-  | expressao DIV expressao         #DivOp
-  | expressao MOD expressao         #ModOp
-  | expressao SUM expressao         #AddOp
-  | expressao SUB expressao         #SubOp
-  | expressao ISEQ expressao        #EqOp
-  | expressao DIFF expressao        #NeqOp
-  | expressao GTHA expressao        #GtOp
-  | expressao LTHA expressao        #LtOp
-  | expressao GETHA expressao       #GeOp
-  | expressao LETHA expressao       #LeOp
-  | expressao AND expressao         #AndOp
-  | expressao OR expressao          #OrOp
-  | NOT expressao                   #NotOp
-  | LPAREN expressao RPAREN         #Parens
-  | chamadaFuncao                   #FuncaoExpr
-  | valor                           #ValorExpr
+  // 1. Nível Atômico (Parenteses, Funções, Literais)
+  : LPAREN expressao RPAREN                   #Parens
+  | chamadaFuncao                             #FuncaoExpr
+  | valor                                     #ValorExpr
+  
+  // 2. Potência (Maior precedência matemática, associativa à direita)
+  | <assoc=right> expressao POW expressao     #ExpOp
+  
+  // 3. Unários (Not lógico e Menos unário se houvesse)
+  | NOT expressao                             #NotOp
+  
+  // 4. Multiplicativos
+  | expressao (MUL | DIV | MOD) expressao     #MulDivModOp
+  
+  // 5. Aditivos
+  | expressao (SUM | SUB) expressao           #AddSubOp
+  
+  // 6. Relacionais (Maior/Menor)
+  | expressao (GTHA | LTHA | GETHA | LETHA) expressao #RelationalOp
+  
+  // 7. Igualdade
+  | expressao (ISEQ | DIFF) expressao         #EqualityOp
+  
+  // 8. Lógico E (AND)
+  | expressao AND expressao                   #AndOp
+  
+  // 9. Lógico OU (OR) - Menor precedência
+  | expressao OR expressao                    #OrOp
   ;
 
-// Literais e identificadores
 valor
   : INT
   | FLOAT
